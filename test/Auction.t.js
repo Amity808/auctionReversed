@@ -76,5 +76,61 @@ describe("ReverseDutchAuction", function () {
         // await expect(reverseDutchAuction.connect(otherAccount).swapExcution(0))
         //   .to.emit(reverseDutchAuction, "AuctionExecuted");
       });
+      it("Should revert with Invalid_Price", async function() {
+        // Seller creates auction
+        const { reverseDutchAuction, owner, saleToken,
+            paymentToken, seller, buyer, token1Address, otherAccount,
+            token2Address} = await loadFixture(
+            deployedReverseDutchAuction
+        );
+        const amount = ethers.parseUnits("0", 18);
+        await saleToken.approve(reverseDutchAuction.target, amount);
+        
+        expect(
+            await reverseDutchAuction.connect(owner).createAuction(
+                token1Address,
+                token2Address,
+                amount,
+                ethers.parseUnits("1", 18),
+                3600, // 1 hour
+                ethers.parseUnits("0.000277778", 18) // 1/hour decrease rate
+              )
+          
+        ).to.revertedWithCustomError(reverseDutchAuction, "Invalid_Amount()");
+       
+
+       
+      });
+
+      it("it Should pass execute auction", async function() {
+        // Seller creates auction
+        const { reverseDutchAuction, owner, saleToken,
+            paymentToken, seller, buyer, token1Address, otherAccount,
+            token2Address} = await loadFixture(
+            deployedReverseDutchAuction
+        );
+        const amount = ethers.parseUnits("10", 18);
+        await saleToken.approve(reverseDutchAuction.target, amount);
+        
+        expect(
+            await reverseDutchAuction.connect(owner).createAuction(
+                token1Address,
+                token2Address,
+                amount,
+                ethers.parseUnits("1", 18),
+                3600, // 1 hour
+                ethers.parseUnits("0.000277778", 18) // 1/hour decrease rate
+              )
+          
+        ).to.emit(reverseDutchAuction, "AuctionCreated");
+       
+
+        //Buyer executes swap
+        // const requiredPayment = ethers.parseUnits("10", 18);
+        // await paymentToken.approve(reverseDutchAuction.target, requiredPayment);
+        
+        // await expect(reverseDutchAuction.connect(otherAccount).swapExcution(0))
+        //   .to.emit(reverseDutchAuction, "AuctionExecuted");
+      });
   })
 });
