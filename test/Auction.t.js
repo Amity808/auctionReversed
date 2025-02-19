@@ -83,11 +83,37 @@ describe("ReverseDutchAuction", function () {
             token2Address} = await loadFixture(
             deployedReverseDutchAuction
         );
+        const amount = ethers.parseUnits("10", 18);
+        await saleToken.approve(reverseDutchAuction.target, amount);
+        
+       await expect(
+             reverseDutchAuction.connect(owner).createAuction(
+                token1Address,
+                token2Address,
+                amount,
+                ethers.parseUnits("0", 18),
+                3600, // 1 hour
+                ethers.parseUnits("0.000277778", 18) // 1/hour decrease rate
+              )
+          
+        ).to.revertedWithCustomError(reverseDutchAuction, "Invalid_Price");
+       
+
+       
+      });
+
+      it("Should revert with Invalid_Amount", async function() {
+        // Seller creates auction
+        const { reverseDutchAuction, owner, saleToken,
+            paymentToken, seller, buyer, token1Address, otherAccount,
+            token2Address} = await loadFixture(
+            deployedReverseDutchAuction
+        );
         const amount = ethers.parseUnits("0", 18);
         await saleToken.approve(reverseDutchAuction.target, amount);
         
-        expect(
-            await reverseDutchAuction.connect(owner).createAuction(
+       await expect(
+             reverseDutchAuction.connect(owner).createAuction(
                 token1Address,
                 token2Address,
                 amount,
@@ -96,7 +122,7 @@ describe("ReverseDutchAuction", function () {
                 ethers.parseUnits("0.000277778", 18) // 1/hour decrease rate
               )
           
-        ).to.revertedWithCustomError(reverseDutchAuction, "Invalid_Amount()");
+        ).to.revertedWithCustomError(reverseDutchAuction, "Invalid_Amount");
        
 
        
