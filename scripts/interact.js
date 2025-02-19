@@ -6,6 +6,7 @@ async function main() {
     await reverseDutchAuction.waitForDeployment();
     console.log("ReverseDutchAuction contract deployed to:", reverseDutchAuction.target);
 
+    const [owner] = await ethers.getSigners();
 
   const MyToken = await hre.ethers.getContractFactory("MyToken");
 
@@ -29,8 +30,10 @@ async function main() {
     const duration = 60 * 60 * 24 * 7;
     const priceDecrement = ethers.parseEther("0.1");
 
-    
+    await token.approve(reverseDutchAuction.target, ethers.parseEther("100"));
 
+    await reverseDutchAuction.connect(owner).createAuction(
+        token1Address, token2Address, amount, initialprice, duration, priceDecrement);
     
 }
 
